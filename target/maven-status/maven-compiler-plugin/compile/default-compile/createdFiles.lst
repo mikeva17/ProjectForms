@@ -1,0 +1,8 @@
+com/example/reports/model/SolicitudReportes.class
+com/example/reports/model/ReporteBasico.class
+com/example/reports/repository/InMemorySolicitudReportesRepository.class
+com/example/reports/repository/SolicitudReportesRepository.class
+com/example/reports/model/TipoCriterio.class
+com/example/reports/view/ReporteFormBean.class
+com/example/reports/model/CriterioReporte.class
+com/example/reports/model/ReporteAutomatico.class

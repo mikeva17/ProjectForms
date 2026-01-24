@@ -1,0 +1,8 @@
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/model/TipoCriterio.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/model/ReporteAutomatico.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/model/SolicitudReportes.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/model/ReporteBasico.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/model/CriterioReporte.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/repository/InMemorySolicitudReportesRepository.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/repository/SolicitudReportesRepository.java
+/home/phantom/Documentos/ProjectForms/src/main/java/com/example/reports/view/ReporteFormBean.java

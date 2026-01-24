@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:p="http://primefaces.org/ui" xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Formulario de Reportes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .block-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .ui-selectmanycheckbox label {
+            margin-right: 15px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <h:form id="reportForm">
+        <p:growl id="growl" showDetail="true" life="3000" />
+
+        <div class="card">
+            <h2 style="margin-top:0">Formulario de Reportes</h2>
+            <p>Configure los criterios y los reportes deseados para cada bloque.</p>
+        </div>
+
+        <ui:repeat value="#{reporteFormBean.listaCriterios}" var="item" varStatus="status">
+
+            <div class="card">
+                <div class="block-header">
+                    <span class="block-title">Bloque de Criterio ##{status.index + 1}</span>
+                    <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger ui-button-outlined ui-button-sm"
+                        actionListener="#{reporteFormBean.eliminarBloque(status.index)}" update="@form" process="@this"
+                        title="Eliminar este bloque" rendered="#{reporteFormBean.listaCriterios.size() > 1}" />
+                </div>
+
+                <div class="form-grid">
+                    <!-- Column 1: Criterio -->
+                    <div>
+                        <p:outputLabel value="Criterio" for="criterio"
+                            style="display:block; margin-bottom: 5px; font-weight:bold;" />
+                        <p:selectOneMenu id="criterio" value="#{item.criterio}" style="width:100%">
+                            <f:selectItem itemLabel="Seleccione..." itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{reporteFormBean.tiposCriterio}" var="t" itemLabel="#{t.label}"
+                                itemValue="#{t}" />
+                            <p:ajax update="valorWrapper growl"
+                                listener="#{reporteFormBean.onCriterioChange(status.index)}" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <!-- Column 2: Value -->
+                    <h:panelGroup id="valorWrapper">
+                        <p:outputLabel value="Valor" for="valor"
+                            style="display:block; margin-bottom: 5px; font-weight:bold;" />
+                        <p:inputText id="valor" value="#{item.valor}" style="width:100%"
+                            placeholder="#{item.criterio == 'EMAIL' ? 'ejemplo@dominio.com' : (item.criterio == 'NOMBRE' ? 'Ingrese Nombre Completo' : 'Seleccione Criterio primero')}" />
+                        <p:message for="valor" />
+                    </h:panelGroup>
+                </div>
+
+                <!-- Reports Sections -->
+                <p:accordionPanel multiple="true" activeIndex="-1">
+                    <p:tab title="Reportes Estandar">
+                        <p:selectManyCheckbox value="#{item.basicos}" layout="responsive" columns="3">
+                            <f:selectItems value="#{reporteFormBean.reportesBasicos}" var="r" itemLabel="#{r.label}"
+                                itemValue="#{r}" />
+                        </p:selectManyCheckbox>
+                    </p:tab>
+
+                    <p:tab title="Reportes Automáticos">
+                        <p:selectManyCheckbox value="#{item.automaticos}" layout="responsive" columns="2">
+                            <f:selectItems value="#{reporteFormBean.reportesAutomaticos}" var="a" itemLabel="#{a.label}"
+                                itemValue="#{a}" />
+                        </p:selectManyCheckbox>
+                    </p:tab>
+                </p:accordionPanel>
+
+            </div>
+        </ui:repeat>
+
+        <div class="card" style="display:flex; gap: 10px; justify-content: space-between;">
+            <p:commandButton value="Agregar otro Criterio" icon="pi pi-plus"
+                actionListener="#{reporteFormBean.agregarBloque}" update="@form" process="@form"
+                styleClass="ui-button-secondary" />
+
+            <div>
+                <p:commandButton value="Limpiar" icon="pi pi-refresh" actionListener="#{reporteFormBean.limpiar}"
+                    update="@form" process="@this" styleClass="ui-button-outlined ui-button-warning"
+                    style="margin-right: 10px;">
+                    <p:confirm header="Confirmación" message="¿Reiniciar todo el formulario?"
+                        icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+
+                <p:commandButton value="Guardar Solicitud" icon="pi pi-check"
+                    actionListener="#{reporteFormBean.guardar}" update="@form" process="@form"
+                    styleClass="ui-button-primary" />
+            </div>
+        </div>
+
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+            <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" />
+        </p:confirmDialog>
+
+    </h:form>
+</h:body>
+
+</html>
