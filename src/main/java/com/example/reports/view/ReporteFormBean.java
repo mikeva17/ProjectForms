@@ -1,6 +1,7 @@
 package com.example.reports.view;
 
-import com.example.reports.model.CriterioReporte;
+import com.example.reports.model.BloqueReporte;
+import com.example.reports.model.CriterioValor;
 import com.example.reports.model.ReporteAutomatico;
 import com.example.reports.model.ReporteBasico;
 import com.example.reports.model.SolicitudReportes;
@@ -22,10 +23,12 @@ import java.util.regex.Pattern;
 @ViewScoped
 public class ReporteFormBean implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Inject
     private SolicitudReportesRepository repository;
 
-    private List<CriterioReporte> listaCriterios;
+    private List<BloqueReporte> listaCriterios;
 
     // Pattern for simple email validation
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
@@ -36,57 +39,80 @@ public class ReporteFormBean implements Serializable {
     }
 
     public void agregarBloque() {
-        listaCriterios.add(new CriterioReporte());
+        listaCriterios.add(new BloqueReporte());
     }
 
     public void eliminarBloque(int index) {
         if (listaCriterios.size() > 1) {
             listaCriterios.remove(index);
         } else {
-            // Optional: Show message that at least one block is required, though logic
-            // usually prevents removing the last one UI-wise or immediately re-adds.
-            // Requirement says "minimo dejar 1 bloque", so if they try to remove the last
-            // one, we can either block it or just clear it.
-            // Let's just clear it if size is 1, essentially acting like reset for that
-            // block, or show error.
-            // Better UX: Don't show delete button for the only block, or just re-init.
-            // Let's adhere strictly: "Minimum leave 1 block".
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso", "Debe existir al menos un criterio."));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso",
+                            "Debe existir al menos un bloque de criterios."));
         }
+    }
+
+    public void agregarCriterio(BloqueReporte bloque) {
+        bloque.agregarCriterio();
+    }
+
+    public void eliminarCriterio(BloqueReporte bloque, int index) {
+        bloque.eliminarCriterio(index);
     }
 
     public void limpiar() {
         listaCriterios = new ArrayList<>();
-        listaCriterios.add(new CriterioReporte());
+        listaCriterios.add(new BloqueReporte());
     }
 
     public void guardar() {
         // Validate
         for (int i = 0; i < listaCriterios.size(); i++) {
-            CriterioReporte c = listaCriterios.get(i);
-            int lineNum = i + 1;
+            BloqueReporte b = listaCriterios.get(i);
+            int blockNum = i + 1;
 
-            if (c.getCriterio() == null) {
-                error("Bloque " + lineNum + ": Debe seleccionar un Criterio.");
+            // Validate dates
+            /*
+             * Requirement:
+             * "periodo de busqueda (1 sola vez por bloque) (fecha inicio y fecha fin)"
+             * Assuming required.
+             */
+            if (b.getFechaInicio() == null || b.getFechaFin() == null) {
+                error("Bloque " + blockNum + ": Debe especificar Fecha Inicio y Fecha Fin.");
                 return;
             }
-            if (c.getValor() == null || c.getValor().trim().isEmpty()) {
-                error("Bloque " + lineNum + ": El Valor no puede estar vacío.");
+            if (b.getFechaInicio().isAfter(b.getFechaFin())) {
+                error("Bloque " + blockNum + ": La Fecha Inicio no puede ser posterior a la Fecha Fin.");
                 return;
             }
 
-            // Email validation
-            if (c.getCriterio() == TipoCriterio.EMAIL) {
-                if (!EMAIL_PATTERN.matcher(c.getValor()).matches()) {
-                    error("Bloque " + lineNum + ": Formato de correo inválido.");
+            // Validate inner criteria
+            List<CriterioValor> criterios = b.getCriterios();
+            for (int j = 0; j < criterios.size(); j++) {
+                CriterioValor c = criterios.get(j);
+                int critNum = j + 1;
+
+                if (c.getCriterio() == null) {
+                    error("Bloque " + blockNum + ", Criterio " + critNum + ": Debe seleccionar un Tipo de Criterio.");
                     return;
+                }
+                if (c.getValor() == null || c.getValor().trim().isEmpty()) {
+                    error("Bloque " + blockNum + ", Criterio " + critNum + ": El Valor no puede estar vacío.");
+                    return;
+                }
+
+                // Email validation
+                if (c.getCriterio() == TipoCriterio.EMAIL) {
+                    if (!EMAIL_PATTERN.matcher(c.getValor()).matches()) {
+                        error("Bloque " + blockNum + ", Criterio " + critNum + ": Formato de correo inválido.");
+                        return;
+                    }
                 }
             }
 
-            if ((c.getBasicos() == null || c.getBasicos().isEmpty()) &&
-                    (c.getAutomaticos() == null || c.getAutomaticos().isEmpty())) {
-                error("Bloque " + lineNum + ": seleccione al menos un reporte (Básico o Automático).");
+            if ((b.getBasicos() == null || b.getBasicos().isEmpty()) &&
+                    (b.getAutomaticos() == null || b.getAutomaticos().isEmpty())) {
+                error("Bloque " + blockNum + ": seleccione al menos un reporte (Básico o Automático).");
                 return;
             }
         }
@@ -97,20 +123,11 @@ public class ReporteFormBean implements Serializable {
 
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Solicitud Guardada OK. ID: " + s.getId()));
-
-        // Requirement: Show summary on screen.
-        // We can just keep the form as is (showing what was saved) or perhaps show a
-        // dialog.
-        // The requirement says "Mostrar en pantalla un resumen... y/o JSON".
-        // Since the form holds the state, simply showing a success message matches
-        // "guardado OK".
-        // We could log the JSON to console or show it in a dialog.
     }
 
     // Listener for criterion change (Ajax)
-    public void onCriterioChange(int index) {
-        CriterioReporte c = listaCriterios.get(index);
-        c.setValor(""); // Clear value on type change to avoid confusion (e.g. name in email field)
+    public void onCriterioChange(CriterioValor c) {
+        c.setValor(""); // Clear value on type change
     }
 
     // Helpers
@@ -132,11 +149,11 @@ public class ReporteFormBean implements Serializable {
         return Arrays.asList(ReporteAutomatico.values());
     }
 
-    public List<CriterioReporte> getListaCriterios() {
+    public List<BloqueReporte> getListaCriterios() {
         return listaCriterios;
     }
 
-    public void setListaCriterios(List<CriterioReporte> listaCriterios) {
+    public void setListaCriterios(List<BloqueReporte> listaCriterios) {
         this.listaCriterios = listaCriterios;
     }
 }

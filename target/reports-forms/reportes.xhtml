@@ -58,9 +58,9 @@
             <p>Configure los criterios y los reportes deseados para cada bloque.</p>
         </div>
 
-        <ui:repeat value="#{reporteFormBean.listaCriterios}" var="item" varStatus="status">
+        <ui:repeat value="#{reporteFormBean.listaCriterios}" var="bloque" varStatus="status">
 
-            <div class="card">
+            <p:outputPanel id="blockPanel" styleClass="card">
                 <div class="block-header">
                     <span class="block-title">Bloque de Criterio ##{status.index + 1}</span>
                     <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger ui-button-outlined ui-button-sm"
@@ -68,52 +68,93 @@
                         title="Eliminar este bloque" rendered="#{reporteFormBean.listaCriterios.size() > 1}" />
                 </div>
 
-                <div class="form-grid">
-                    <!-- Column 1: Criterio -->
+                <!-- Date Range Section -->
+                <div class="form-grid"
+                    style="grid-template-columns: 1fr 1fr; margin-bottom: 20px; background-color: #fafafa; padding: 10px; border-radius: 4px;">
                     <div>
-                        <p:outputLabel value="Criterio" for="criterio"
+                        <p:outputLabel value="Fecha Inicio" for="fechaInicio"
                             style="display:block; margin-bottom: 5px; font-weight:bold;" />
-                        <p:selectOneMenu id="criterio" value="#{item.criterio}" style="width:100%">
-                            <f:selectItem itemLabel="Seleccione..." itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{reporteFormBean.tiposCriterio}" var="t" itemLabel="#{t.label}"
-                                itemValue="#{t}" />
-                            <p:ajax update="valorWrapper growl"
-                                listener="#{reporteFormBean.onCriterioChange(status.index)}" />
-                        </p:selectOneMenu>
+                        <p:datePicker id="fechaInicio" value="#{bloque.fechaInicio}" showTime="true"
+                            pattern="dd/MM/yyyy HH:mm" showIcon="true" style="width:100%" />
+                        <p:message for="fechaInicio" />
                     </div>
-
-                    <!-- Column 2: Value -->
-                    <h:panelGroup id="valorWrapper">
-                        <p:outputLabel value="Valor" for="valor"
+                    <div>
+                        <p:outputLabel value="Fecha Fin" for="fechaFin"
                             style="display:block; margin-bottom: 5px; font-weight:bold;" />
-                        <p:inputText id="valor" value="#{item.valor}" style="width:100%"
-                            placeholder="#{item.criterio == 'EMAIL' ? 'ejemplo@dominio.com' : (item.criterio == 'NOMBRE' ? 'Ingrese Nombre Completo' : 'Seleccione Criterio primero')}" />
-                        <p:message for="valor" />
-                    </h:panelGroup>
+                        <p:datePicker id="fechaFin" value="#{bloque.fechaFin}" showTime="true"
+                            pattern="dd/MM/yyyy HH:mm" showIcon="true" style="width:100%" />
+                        <p:message for="fechaFin" />
+                    </div>
+                </div>
+
+                <!-- Criteria List -->
+                <h:panelGroup id="criteriosList">
+                    <ui:repeat value="#{bloque.criterios}" var="criterio" varStatus="cStatus">
+                        <div class="form-grid" style="grid-template-columns: 1fr 2fr 0.5fr; align-items: end;">
+                            <!-- Column 1: Criterio -->
+                            <div>
+                                <p:outputLabel value="Criterio" for="criterioType"
+                                    style="display:block; margin-bottom: 5px; font-weight:bold;"
+                                    rendered="#{cStatus.first}" />
+                                <p:selectOneMenu id="criterioType" value="#{criterio.criterio}" style="width:100%">
+                                    <f:selectItem itemLabel="Seleccione..." itemValue="#{null}"
+                                        noSelectionOption="true" />
+                                    <f:selectItems value="#{reporteFormBean.tiposCriterio}" var="t"
+                                        itemLabel="#{t.label}" itemValue="#{t}" />
+                                    <p:ajax update="valorWrapper growl"
+                                        listener="#{reporteFormBean.onCriterioChange(criterio)}" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <!-- Column 2: Value -->
+                            <h:panelGroup id="valorWrapper">
+                                <p:outputLabel value="Valor" for="valor"
+                                    style="display:block; margin-bottom: 5px; font-weight:bold;"
+                                    rendered="#{cStatus.first}" />
+                                <p:inputText id="valor" value="#{criterio.valor}" style="width:100%"
+                                    placeholder="#{criterio.criterio == 'EMAIL' ? 'ejemplo@dominio.com' : (criterio.criterio == 'NOMBRE' ? 'Ingrese Nombre' : 'Seleccione Criterio')}" />
+                                <p:message for="valor" />
+                            </h:panelGroup>
+
+                            <!-- Column 3: Remove Button -->
+                            <div>
+                                <p:commandButton icon="pi pi-times" styleClass="ui-button-danger ui-button-flat"
+                                    actionListener="#{reporteFormBean.eliminarCriterio(bloque, cStatus.index)}"
+                                    update="@form" process="@this" title="Eliminar criterio"
+                                    rendered="#{bloque.criterios.size() > 1}" />
+                            </div>
+                        </div>
+                    </ui:repeat>
+                </h:panelGroup>
+
+                <div style="margin-bottom: 20px;">
+                    <p:commandButton value="Agregar otro Criterio" icon="pi pi-plus-circle"
+                        actionListener="#{reporteFormBean.agregarCriterio(bloque)}" update="@form" process="@form"
+                        styleClass="ui-button-secondary ui-button-sm ui-button-outlined" />
                 </div>
 
                 <!-- Reports Sections -->
                 <p:accordionPanel multiple="true" activeIndex="-1">
                     <p:tab title="Reportes Estandar">
-                        <p:selectManyCheckbox value="#{item.basicos}" layout="responsive" columns="3">
+                        <p:selectManyCheckbox value="#{bloque.basicos}" layout="responsive" columns="3">
                             <f:selectItems value="#{reporteFormBean.reportesBasicos}" var="r" itemLabel="#{r.label}"
                                 itemValue="#{r}" />
                         </p:selectManyCheckbox>
                     </p:tab>
 
                     <p:tab title="Reportes Automáticos">
-                        <p:selectManyCheckbox value="#{item.automaticos}" layout="responsive" columns="2">
+                        <p:selectManyCheckbox value="#{bloque.automaticos}" layout="responsive" columns="2">
                             <f:selectItems value="#{reporteFormBean.reportesAutomaticos}" var="a" itemLabel="#{a.label}"
                                 itemValue="#{a}" />
                         </p:selectManyCheckbox>
                     </p:tab>
                 </p:accordionPanel>
 
-            </div>
+            </p:outputPanel>
         </ui:repeat>
 
         <div class="card" style="display:flex; gap: 10px; justify-content: space-between;">
-            <p:commandButton value="Agregar otro Criterio" icon="pi pi-plus"
+            <p:commandButton value="Agregar otro bloque" icon="pi pi-plus"
                 actionListener="#{reporteFormBean.agregarBloque}" update="@form" process="@form"
                 styleClass="ui-button-secondary" />
 

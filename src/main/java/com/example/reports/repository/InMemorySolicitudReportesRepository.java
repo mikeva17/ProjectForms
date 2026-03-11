@@ -27,10 +27,16 @@ public class InMemorySolicitudReportesRepository implements SolicitudReportesRep
             sb.append("FECHA: ").append(s.getFecha()).append("\n");
             sb.append("CRITERIOS:\n");
 
-            for (com.example.reports.model.CriterioReporte c : s.getCriterios()) {
-                sb.append("  - TIPO: ").append(c.getCriterio()).append(", VALOR: ").append(c.getValor()).append("\n");
-                sb.append("    Reportes Estandar: ").append(c.getBasicos()).append("\n");
-                sb.append("    Reportes Automáticos: ").append(c.getAutomaticos()).append("\n");
+            for (com.example.reports.model.BloqueReporte b : s.getCriterios()) {
+                sb.append("  - BLOQUE:\n");
+                sb.append("    Fecha Inicio: ").append(b.getFechaInicio()).append(", Fecha Fin: ")
+                        .append(b.getFechaFin()).append("\n");
+                sb.append("    Criterios:\n");
+                for (com.example.reports.model.CriterioValor cv : b.getCriterios()) {
+                    sb.append("      * ").append(cv.getCriterio()).append(": ").append(cv.getValor()).append("\n");
+                }
+                sb.append("    Reportes Estandar: ").append(b.getBasicos()).append("\n");
+                sb.append("    Reportes Automáticos: ").append(b.getAutomaticos()).append("\n");
                 sb.append("    --------------------------------------\n");
             }
             sb.append("==========================================\n");
