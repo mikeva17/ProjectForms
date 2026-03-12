@@ -64,7 +64,7 @@
                 <div class="block-header">
                     <span class="block-title">Bloque de Criterio ##{status.index + 1}</span>
                     <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger ui-button-outlined ui-button-sm"
-                        actionListener="#{reporteFormBean.eliminarBloque(status.index)}" update="@form" process="@this"
+                        actionListener="#{reporteFormBean.eliminarBloque(status.index)}" update="@form" process="@form"
                         title="Eliminar este bloque" rendered="#{reporteFormBean.listaCriterios.size() > 1}" />
                 </div>
 
@@ -101,8 +101,8 @@
                                         noSelectionOption="true" />
                                     <f:selectItems value="#{reporteFormBean.tiposCriterio}" var="t"
                                         itemLabel="#{t.label}" itemValue="#{t}" />
-                                    <p:ajax update="valorWrapper growl"
-                                        listener="#{reporteFormBean.onCriterioChange(criterio)}" />
+                                    <p:ajax update="@form" process="@form"
+                                        listener="#{reporteFormBean.onCriterioChange(bloque, criterio)}" />
                                 </p:selectOneMenu>
                             </div>
 
@@ -120,7 +120,7 @@
                             <div>
                                 <p:commandButton icon="pi pi-times" styleClass="ui-button-danger ui-button-flat"
                                     actionListener="#{reporteFormBean.eliminarCriterio(bloque, cStatus.index)}"
-                                    update="@form" process="@this" title="Eliminar criterio"
+                                    update="@form" process="@form" title="Eliminar criterio"
                                     rendered="#{bloque.criterios.size() > 1}" />
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                         </p:selectManyCheckbox>
                     </p:tab>
 
-                    <p:tab title="Reportes Automáticos">
+                    <p:tab title="Reportes Automáticos" disabled="#{not bloque.automaticosHabilitados}">
                         <p:selectManyCheckbox value="#{bloque.automaticos}" layout="responsive" columns="2">
                             <f:selectItems value="#{reporteFormBean.reportesAutomaticos}" var="a" itemLabel="#{a.label}"
                                 itemValue="#{a}" />

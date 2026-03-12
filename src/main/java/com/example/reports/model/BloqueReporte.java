@@ -88,4 +88,14 @@ public class BloqueReporte implements Serializable {
             this.criterios.remove(index);
         }
     }
+
+    public boolean isAutomaticosHabilitados() {
+        if (criterios == null) return false;
+        for (CriterioValor c : criterios) {
+            if (c.getCriterio() != null && c.getCriterio().isPermiteAutomaticos()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

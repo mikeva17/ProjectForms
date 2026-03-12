@@ -43,6 +43,9 @@ public class InMemorySolicitudReportesRepository implements SolicitudReportesRep
 
             java.nio.file.Files.write(path, sb.toString().getBytes(), java.nio.file.StandardOpenOption.CREATE,
                     java.nio.file.StandardOpenOption.APPEND);
+            System.out.println("-- SOL --");
+            System.out.println(sb.toString());
+            System.out.println("-- SOL --");
             System.out.println("Guardado en archivo: " + path);
 
         } catch (java.io.IOException e) {

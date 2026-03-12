@@ -58,6 +58,7 @@ public class ReporteFormBean implements Serializable {
 
     public void eliminarCriterio(BloqueReporte bloque, int index) {
         bloque.eliminarCriterio(index);
+        evaluarAutomaticos(bloque);
     }
 
     public void limpiar() {
@@ -126,8 +127,15 @@ public class ReporteFormBean implements Serializable {
     }
 
     // Listener for criterion change (Ajax)
-    public void onCriterioChange(CriterioValor c) {
+    public void onCriterioChange(BloqueReporte bloque, CriterioValor c) {
         c.setValor(""); // Clear value on type change
+        evaluarAutomaticos(bloque);
+    }
+
+    private void evaluarAutomaticos(BloqueReporte bloque) {
+        if (!bloque.isAutomaticosHabilitados()) {
+            bloque.getAutomaticos().clear();
+        }
     }
 
     // Helpers
