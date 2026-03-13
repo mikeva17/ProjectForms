@@ -62,7 +62,7 @@
 
             <p:outputPanel id="blockPanel" styleClass="card">
                 <div class="block-header">
-                    <span class="block-title">Bloque de Criterio ##{status.index + 1}</span>
+                    <span class="block-title">Bloque de busqueda ##{status.index + 1}</span>
                     <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger ui-button-outlined ui-button-sm"
                         actionListener="#{reporteFormBean.eliminarBloque(status.index)}" update="@form" process="@form"
                         title="Eliminar este bloque" rendered="#{reporteFormBean.listaCriterios.size() > 1}" />
@@ -93,9 +93,8 @@
                         <div class="form-grid" style="grid-template-columns: 1fr 2fr 0.5fr; align-items: end;">
                             <!-- Column 1: Criterio -->
                             <div>
-                                <p:outputLabel value="Criterio" for="criterioType"
-                                    style="display:block; margin-bottom: 5px; font-weight:bold;"
-                                    rendered="#{cStatus.first}" />
+                                <p:outputLabel value="Criterio #{reporteFormBean.getIndiceGlobalCriterio(criterio)}" for="criterioType"
+                                    style="display:block; margin-bottom: 5px; font-weight:bold;" />
                                 <p:selectOneMenu id="criterioType" value="#{criterio.criterio}" style="width:100%">
                                     <f:selectItem itemLabel="Seleccione..." itemValue="#{null}"
                                         noSelectionOption="true" />
@@ -104,13 +103,13 @@
                                     <p:ajax update="@form" process="@form"
                                         listener="#{reporteFormBean.onCriterioChange(bloque, criterio)}" />
                                 </p:selectOneMenu>
+                                <p:message for="criterioType" />
                             </div>
 
                             <!-- Column 2: Value -->
-                            <h:panelGroup id="valorWrapper">
+                            <h:panelGroup id="valorWrapper" layout="block">
                                 <p:outputLabel value="Valor" for="valor"
-                                    style="display:block; margin-bottom: 5px; font-weight:bold;"
-                                    rendered="#{cStatus.first}" />
+                                    style="display:block; margin-bottom: 5px; font-weight:bold;" />
                                 <p:inputText id="valor" value="#{criterio.valor}" style="width:100%"
                                     placeholder="#{criterio.criterio == 'EMAIL' ? 'ejemplo@dominio.com' : (criterio.criterio == 'NOMBRE' ? 'Ingrese Nombre' : 'Seleccione Criterio')}" />
                                 <p:message for="valor" />

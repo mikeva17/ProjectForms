@@ -1,0 +1,156 @@
+# ==================================================
+
+# Maven / Build
+
+# ==================================================
+
+target/
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Ignore packaged artifacts
+
+*.jar
+*.war
+*.ear
+
+# ==================================================
+
+# Logs
+
+# ==================================================
+
+*.log
+logs/
+hs_err_pid*
+
+# ==================================================
+
+# OS Files
+
+# ==================================================
+
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+*~
+
+# ==================================================
+
+# IntelliJ IDEA
+
+# ==================================================
+
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# ==================================================
+
+# Eclipse
+
+# ==================================================
+
+.project
+.classpath
+.settings/
+.metadata/
+
+# ==================================================
+
+# VS Code
+
+# ==================================================
+
+.vscode/
+
+# ==================================================
+
+# NetBeans
+
+# ==================================================
+
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ==================================================
+
+# Node (if frontend assets exist)
+
+# ==================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==================================================
+
+# Environment / Local Config
+
+# ==================================================
+
+.env
+.env.*
+*.local
+application-local.properties
+application-dev.properties
+
+# ==================================================
+
+# Temp / Cache
+
+# ==================================================
+
+tmp/
+temp/
+.cache/
+
+# ==================================================
+
+# Application Server Files
+
+# ==================================================
+
+# WildFly / JBoss
+
+standalone/log/
+standalone/tmp/
+standalone/data/
+
+# GlassFish / Payara
+
+glassfish/domains/domain1/logs/
+glassfish/domains/domain1/generated/
+
+# Tomcat
+
+logs/
+work/
+temp/
+
+# ==================================================
+
+# Test / Coverage
+
+# ==================================================
+
+coverage/
+*.coverage
+jacoco.exec
+
+# ==================================================
+
+# Generated sources
+
+# ==================================================
+
+generated/

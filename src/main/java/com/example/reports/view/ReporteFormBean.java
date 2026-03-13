@@ -157,6 +157,19 @@ public class ReporteFormBean implements Serializable {
         return Arrays.asList(ReporteAutomatico.values());
     }
 
+    public int getIndiceGlobalCriterio(CriterioValor target) {
+        int index = 1;
+        for (BloqueReporte bloque : listaCriterios) {
+            for (CriterioValor c : bloque.getCriterios()) {
+                if (c == target) {
+                    return index;
+                }
+                index++;
+            }
+        }
+        return index;
+    }
+
     public List<BloqueReporte> getListaCriterios() {
         return listaCriterios;
     }
